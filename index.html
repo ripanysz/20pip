@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XAUUSD 60 dni Challenge</title>
+    <title>XAUUSD</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         /* === DARK THEME === */
@@ -79,13 +79,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>XAUUSD - 60 Dniowy Challenge</h1>
-        
-        <div class="summary">
-            <strong>Parametry:</strong><br>
-            Saldo początkowe: $20 | Cel: $1000 | Okres: 60 dni<br>
-            Dzienny wzrost: 13.55% | Lot start: 0.01 | Lot max: 1.0
-        </div>
+        <h1>XAUUSD</h1>
 
         <table id="challengeTable">
             <thead>
@@ -104,20 +98,17 @@
     <script>
         function generateData() {
             const dni = 60;
-            const saldoStart = 20;
-            const cel = 1000;
+            let saldo = 20; // saldo początkowe
             const lotStart = 0.01;
             const lotMax = 1.0;
             const lotIncrement = 0.01;
 
-            const r = Math.pow(cel / saldoStart, 1 / dni) - 1;
-
-            let saldo = saldoStart;
             let lot = lotStart;
             const data = [];
 
             for (let day = 1; day <= dni; day++) {
-                const profit = saldo * r;
+                // zysk rośnie o 3 dziennie: 3, 6, 9, 12, ...
+                const profit = day * 3;
                 const saldoEnd = saldo + profit;
 
                 data.push({
