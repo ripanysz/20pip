@@ -1,117 +1,105 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <title>XAUUSD</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>XAUUSD</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        h1 {
-            color: #4CAF50;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        /* === PANEL W PRAWYM GÓRNYM ROGU === */
-        .stats {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: #263238;
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-weight: bold;
-            color: #81c784;
-            border: 1px solid #4CAF50;
-            text-align: right;
-            line-height: 1.5;
-        }
-
-        canvas {
-            margin-top: 25px;
-            background: #111;
-            border-radius: 8px;
-            border: 1px solid #333;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
-            background-color: #1b1b1b;
-        }
-
-        th, td {
-            border: 1px solid #333;
-            padding: 12px;
-            text-align: right;
-        }
-
-        th {
-            background-color: #2b2b2b;
-            color: #81c784;
-            font-weight: bold;
-        }
-
-        tr:nth-child(even) {
-            background-color: #222;
-        }
-
-        tr:hover {
-            background-color: #333;
-        }
-
-        input[type="checkbox"] {
-            transform: scale(1.2);
-            accent-color: #4CAF50;
-            cursor: pointer;
-            margin-right: 6px;
-        }
-    </style>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #121212;
+    color: #e0e0e0;
+}
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    position: relative;
+}
+h1 {
+    color: #4CAF50;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.stats {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: #263238;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: bold;
+    color: #81c784;
+    border: 1px solid #4CAF50;
+    text-align: right;
+    line-height: 1.5;
+}
+canvas {
+    margin-top: 25px;
+    background: #111;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    background-color: #1b1b1b;
+}
+th, td {
+    border: 1px solid #333;
+    padding: 12px;
+    text-align: right;
+}
+th {
+    background-color: #2b2b2b;
+    color: #81c784;
+    font-weight: bold;
+}
+tr:nth-child(even) {
+    background-color: #222;
+}
+tr:hover {
+    background-color: #333;
+}
+input[type="checkbox"] {
+    transform: scale(1.2);
+    accent-color: #4CAF50;
+    cursor: pointer;
+    margin-right: 6px;
+}
+</style>
 </head>
 <body>
 
 <div class="container">
 
-    <div class="stats">
-        <div id="counter">Wykonane: 0 / 60</div>
-        <div id="profitSum">Zysk razem: $0.00</div>
-    </div>
+<div class="stats">
+    <div id="counter">Wykonane: 0 / 60</div>
+    <div id="profitSum">Zysk razem: $0.00</div>
+</div>
 
-    <h1>XAUUSD</h1>
+<h1>XAUUSD</h1>
 
-    <!-- WYKRES -->
-    <canvas id="progressChart" width="960" height="300"></canvas>
+<canvas id="progressChart" width="960" height="300"></canvas>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Dzień</th>
-                <th>Saldo początkowe ($)</th>
-                <th>Lot Size</th>
-                <th>Zysk dzienny ($)</th>
-                <th>Saldo końcowe ($)</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
+<table>
+<thead>
+<tr>
+<th>Dzień</th>
+<th>Saldo początkowe ($)</th>
+<th>Lot Size</th>
+<th>Zysk dzienny ($)</th>
+<th>Saldo końcowe ($)</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
 </div>
 
 <script>
@@ -121,30 +109,20 @@ function generateData() {
     const lotStart = 0.01;
     const lotMax = 1.0;
     const lotIncrement = 0.01;
-
     let lot = lotStart;
     const data = [];
-
-    for (let day = 1; day <= dni; day++) {
-        const profit = day * 2; // 2, 4, 6, 8...
-        const saldoEnd = saldo + profit;
-
-        data.push({
-            day: day,
-            saldoStart: saldo,
-            lot: lot,
-            profit: profit,
-            saldoEnd: saldoEnd
-        });
-
+    for (let day=1; day<=dni; day++) {
+        const profit = day*2;
+        const saldoEnd = saldo+profit;
+        data.push({day, saldoStart: saldo, lot, profit, saldoEnd});
         saldo = saldoEnd;
-        if (lot < lotMax) {
-            lot += lotIncrement;
-            if (lot > lotMax) lot = lotMax;
-        }
+        if (lot<lotMax) {lot+=lotIncrement; if(lot>lotMax) lot=lotMax;}
     }
     return data;
 }
+
+let lastPoints = []; // pamięta poprzednie punkty wykresu
+let animationId;
 
 function renderTable() {
     const data = generateData();
@@ -156,7 +134,6 @@ function renderTable() {
     data.forEach(row => {
         const tr = document.createElement('tr');
         const isChecked = savedChecks[row.day] ? 'checked' : '';
-
         tr.innerHTML = `
             <td style="text-align:left">
                 <label>
@@ -169,97 +146,77 @@ function renderTable() {
             <td>$${row.profit.toFixed(2)}</td>
             <td><strong>$${row.saldoEnd.toFixed(2)}</strong></td>
         `;
-
         tbody.appendChild(tr);
     });
 
     addCheckboxListeners();
     updateStats();
-    drawChart();
+    drawChartSmooth();
 }
 
 function addCheckboxListeners() {
-    const checkboxes = document.querySelectorAll('.day-checkbox');
-
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', function () {
-            const day = this.dataset.day;
-            let savedChecks = JSON.parse(localStorage.getItem('checkedDays')) || {};
-
-            if (this.checked) {
-                savedChecks[day] = true;
-            } else {
-                delete savedChecks[day];
-            }
-
+    document.querySelectorAll('.day-checkbox').forEach(cb=>{
+        cb.addEventListener('change',function(){
+            const day=this.dataset.day;
+            let savedChecks = JSON.parse(localStorage.getItem('checkedDays'))||{};
+            if(this.checked){savedChecks[day]=true;} else {delete savedChecks[day];}
             localStorage.setItem('checkedDays', JSON.stringify(savedChecks));
             updateStats();
-            drawChart();
+            drawChartSmooth();
         });
     });
 }
 
 function updateStats() {
-    const savedChecks = JSON.parse(localStorage.getItem('checkedDays')) || {};
+    const savedChecks = JSON.parse(localStorage.getItem('checkedDays'))||{};
     const data = generateData();
-
-    let count = 0;
-    let profitSum = 0;
-
-    data.forEach(row => {
-        if (savedChecks[row.day]) {
-            count++;
-            profitSum += row.profit;
-        }
-    });
-
-    document.getElementById('counter').textContent = `Wykonane: ${count} / 60`;
-    document.getElementById('profitSum').textContent = `Zysk razem: $${profitSum.toFixed(2)}`;
+    let count=0, profitSum=0;
+    data.forEach(row=>{if(savedChecks[row.day]){count++; profitSum+=row.profit;}});
+    document.getElementById('counter').textContent=`Wykonane: ${count} / 60`;
+    document.getElementById('profitSum').textContent=`Zysk razem: $${profitSum.toFixed(2)}`;
 }
 
-/* ===== WYKRES POSTĘPU ===== */
-function drawChart() {
+/* ===== PŁYNNA ANIMACJA WYKRESU ===== */
+function drawChartSmooth() {
     const canvas = document.getElementById("progressChart");
     const ctx = canvas.getContext("2d");
+    ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const savedChecks = JSON.parse(localStorage.getItem('checkedDays')) || {};
+    const savedChecks = JSON.parse(localStorage.getItem('checkedDays'))||{};
     const data = generateData();
+    let points=[];
+    let currentSum=0;
+    data.forEach(row=>{if(savedChecks[row.day]){currentSum+=row.profit; points.push(currentSum);}});
+    if(points.length===0){lastPoints=[]; return;}
+    const maxValue=Math.max(...points);
+    const padding=40;
+    const stepX=(canvas.width-padding*2)/(points.length-1||1);
 
-    let points = [];
-    let currentSum = 0;
+    let animProgress=lastPoints.length/points.length;
 
-    data.forEach(row => {
-        if (savedChecks[row.day]) {
-            currentSum += row.profit;
-            points.push(currentSum);
-        }
-    });
+    cancelAnimationFrame(animationId);
 
-    if (points.length === 0) return;
+    function animate(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.beginPath();
+        ctx.strokeStyle="#4CAF50";
+        ctx.lineWidth=3;
+        const n=Math.ceil(points.length*animProgress);
+        points.slice(0,n).forEach((value,index)=>{
+            const x=padding+index*stepX;
+            const y=canvas.height-padding-(value/maxValue)*(canvas.height-padding*2);
+            if(index===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        });
+        ctx.stroke();
+        animProgress+=0.02;
+        if(animProgress<1) animationId=requestAnimationFrame(animate);
+        else lastPoints=[...points];
+    }
 
-    const maxValue = Math.max(...points);
-    const padding = 40;
-    const stepX = (canvas.width - padding * 2) / (points.length - 1 || 1);
-
-    ctx.beginPath();
-    ctx.strokeStyle = "#4CAF50";
-    ctx.lineWidth = 3;
-
-    points.forEach((value, index) => {
-        const x = padding + index * stepX;
-        const y = canvas.height - padding - (value / maxValue) * (canvas.height - padding * 2);
-
-        if (index === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    });
-
-    ctx.stroke();
+    animate();
 }
 
 renderTable();
 </script>
-
 </body>
 </html>
