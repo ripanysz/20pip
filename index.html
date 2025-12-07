@@ -2,17 +2,17 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XAUUSD</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
-        /* === DARK THEME === */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
             background-color: #121212;
             color: #e0e0e0;
         }
+
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -20,55 +20,55 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            position: relative;
         }
+
         h1 {
             color: #4CAF50;
             text-align: center;
             margin-bottom: 20px;
         }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px 24px;
-            font-size: 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            transition: background 0.3s;
+
+        /* === LICZNIK === */
+        .counter {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: #263238;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #81c784;
+            border: 1px solid #4CAF50;
         }
-        button:hover {
-            background-color: #43a047;
-        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
             background-color: #1b1b1b;
         }
+
         th, td {
             border: 1px solid #333;
             padding: 12px;
             text-align: right;
         }
+
         th {
             background-color: #2b2b2b;
             color: #81c784;
             font-weight: bold;
         }
+
         tr:nth-child(even) {
             background-color: #222;
         }
+
         tr:hover {
             background-color: #333;
         }
-        .summary {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #263238;
-            border-left: 4px solid #4CAF50;
-            border-radius: 6px;
-        }
+
         input[type="checkbox"] {
             transform: scale(1.2);
             accent-color: #4CAF50;
@@ -78,82 +78,117 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>XAUUSD</h1>
 
-        <table id="challengeTable">
-            <thead>
-                <tr>
-                    <th>Dzień</th>
-                    <th>Saldo początkowe ($)</th>
-                    <th>Lot Size</th>
-                    <th>Zysk dzienny ($)</th>
-                    <th>Saldo końcowe ($)</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
+<div class="container">
+    <div class="counter" id="counter">Wykonane: 0 / 60</div>
 
-    <script>
-        function generateData() {
-            const dni = 60;
-            let saldo = 20; // saldo początkowe
-            const lotStart = 0.01;
-            const lotMax = 1.0;
-            const lotIncrement = 0.01;
+    <h1>XAUUSD</h1>
 
-            let lot = lotStart;
-            const data = [];
+    <table>
+        <thead>
+            <tr>
+                <th>Dzień</th>
+                <th>Saldo początkowe ($)</th>
+                <th>Lot Size</th>
+                <th>Zysk dzienny ($)</th>
+                <th>Saldo końcowe ($)</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
 
-            for (let day = 1; day <= dni; day++) {
-                // zysk rośnie o 2 dziennie: 2, 4, 6, 8, ...
-                const profit = day * 2;
-                const saldoEnd = saldo + profit;
+<script>
+function generateData() {
+    const dni = 60;
+    let saldo = 20;
+    const lotStart = 0.01;
+    const lotMax = 1.0;
+    const lotIncrement = 0.01;
 
-                data.push({
-                    day: day,
-                    saldoStart: Math.round(saldo * 100) / 100,
-                    lot: Math.round(lot * 100) / 100,
-                    profit: Math.round(profit * 100) / 100,
-                    saldoEnd: Math.round(saldoEnd * 100) / 100
-                });
+    let lot = lotStart;
+    const data = [];
 
-                saldo = saldoEnd;
-                if (lot < lotMax) {
-                    lot += lotIncrement;
-                    if (lot > lotMax) lot = lotMax;
-                }
+    for (let day = 1; day <= dni; day++) {
+        const profit = day * 2; // 2, 4, 6, 8...
+        const saldoEnd = saldo + profit;
+
+        data.push({
+            day: day,
+            saldoStart: saldo,
+            lot: lot,
+            profit: profit,
+            saldoEnd: saldoEnd
+        });
+
+        saldo = saldoEnd;
+        if (lot < lotMax) {
+            lot += lotIncrement;
+            if (lot > lotMax) lot = lotMax;
+        }
+    }
+    return data;
+}
+
+function renderTable() {
+    const data = generateData();
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    const savedChecks = JSON.parse(localStorage.getItem('checkedDays')) || {};
+
+    data.forEach(row => {
+        const tr = document.createElement('tr');
+        const isChecked = savedChecks[row.day] ? 'checked' : '';
+
+        tr.innerHTML = `
+            <td style="text-align:left">
+                <label>
+                    <input type="checkbox" class="day-checkbox" data-day="${row.day}" ${isChecked}>
+                    Dzień ${row.day}
+                </label>
+            </td>
+            <td>$${row.saldoStart.toFixed(2)}</td>
+            <td>${row.lot.toFixed(2)}</td>
+            <td>$${row.profit.toFixed(2)}</td>
+            <td><strong>$${row.saldoEnd.toFixed(2)}</strong></td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+
+    addCheckboxListeners();
+    updateCounter();
+}
+
+function addCheckboxListeners() {
+    const checkboxes = document.querySelectorAll('.day-checkbox');
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function () {
+            const day = this.dataset.day;
+            let savedChecks = JSON.parse(localStorage.getItem('checkedDays')) || {};
+
+            if (this.checked) {
+                savedChecks[day] = true;
+            } else {
+                delete savedChecks[day];
             }
-            return data;
-        }
 
-        function renderTable() {
-            const data = generateData();
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
+            localStorage.setItem('checkedDays', JSON.stringify(savedChecks));
+            updateCounter();
+        });
+    });
+}
 
-            data.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="text-align: left;">
-                        <label>
-                            <input type="checkbox" name="day${row.day}">
-                            Dzień ${row.day}
-                        </label>
-                    </td>
-                    <td>$${row.saldoStart.toFixed(2)}</td>
-                    <td>${row.lot.toFixed(2)}</td>
-                    <td>$${row.profit.toFixed(2)}</td>
-                    <td><strong>$${row.saldoEnd.toFixed(2)}</strong></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+function updateCounter() {
+    const savedChecks = JSON.parse(localStorage.getItem('checkedDays')) || {};
+    const count = Object.keys(savedChecks).length;
+    document.getElementById('counter').textContent = `Wykonane: ${count} / 60`;
+}
 
-        renderTable();
-    </script>
+renderTable();
+</script>
+
 </body>
 </html>
-
-
