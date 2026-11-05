@@ -112,7 +112,7 @@ function generateData() {
     let lot = lotStart;
     const data = [];
     for (let day=1; day<=dni; day++) {
-        const profit = day*2;
+        const profit = day*1;
         const saldoEnd = saldo+profit;
         data.push({day, saldoStart: saldo, lot, profit, saldoEnd});
         saldo = saldoEnd;
